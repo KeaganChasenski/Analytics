@@ -25,6 +25,9 @@ if uploaded_file is not None:
         # The 5 main Londolozi camps to look for in Column A
         TARGET_CAMPS = ['TREE', 'VARTY', 'GRANITE', 'FOUNDERS', 'PIONEER']
         
+        # Words/characters we want the script to completely ignore
+        IGNORE_LIST = ['-', '--', 'nan', 'tbc', 'tba', '?', '??']
+        
         # 2. Loop through every day
         for sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
@@ -46,7 +49,7 @@ if uploaded_file is not None:
                 
                 for row in ws.iter_rows(min_row=1, max_row=ws.max_row):
                     
-                    # MAGIC: Check the very first column (Column A) to see what camp section we are in
+                    # Check the very first column (Column A) to see what camp section we are in
                     col_a_val = row[0].value
                     if col_a_val and isinstance(col_a_val, str):
                         possible_camp = col_a_val.strip().upper()
@@ -62,7 +65,9 @@ if uploaded_file is not None:
                                 
                                 for r in str(cell.value).split('/'):
                                     clean_name = r.strip()
-                                    if clean_name and clean_name.lower() != 'nan':
+                                    
+                                    # THE FIX: Check that the name isn't blank, and isn't in our ignore list
+                                    if clean_name and clean_name.lower() not in IGNORE_LIST:
                                         
                                         daily_rangers.add(clean_name)
                                         if is_bold:
